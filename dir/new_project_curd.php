@@ -1,4 +1,5 @@
 <?php
+//INSERT INTO `Note Title` (`s_no`, `title`, `description`, `timestmp`) VALUES (NULL, 'again do it', 'sabji la a ladla', current_timestamp());
 $server = "localhost";
 $username = "root";
 $password = "";
@@ -10,9 +11,7 @@ $conn = new mysqli($server, $username, $password, $database);
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
-}
-else{
-     echo "Connection successful";
+
 }
 ?>
 
@@ -92,16 +91,14 @@ else{
 
   <div class="container"> 
     <?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $title = $_POST['title'];
-        $description = $_POST['description'];
-
-        // Here you can add code to insert the note into a database
-        echo "<h3>Note Added Successfully!</h3>";
-        echo "<p><strong>Title:</strong> $title</p>";
-        echo "<p><strong>Description:</strong> $description</p>";
+    $sql = "SELECT * FROM `Note Title`";
+    $result = mysqli_query($conn, $sql);
+    while ($row = mysqli_fetch_assoc($result)) {
+        echo $row['s_no'] . ". " . $row['title'] . " " . $row['description'] . " " . $row['timestmp'];
+        echo "<br>";
     }
-    ?></div>
+    ?>
+    </div>
 </body>
 
 </html>
