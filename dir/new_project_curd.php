@@ -11,8 +11,22 @@ $conn = new mysqli($server, $username, $password, $database);
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
-
 }
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $title = $_POST['title'];
+        $description = $_POST['description'];
+
+        // Sql query to be executed
+        $sql = "INSERT INTO `note title` (`title`, `description`) VALUES ('$title', '$description')";
+        $result = mysqli_query($conn, $sql);
+
+        if ($result) {
+            echo "The record has been inserted successfully successfully!<br>";
+        } else {
+            echo "The record was not inserted successfully because of this error ---> " . mysqli_error($conn);
+        }
+    }
+
 ?>
 
 <!doctype html>
@@ -75,30 +89,47 @@ if ($conn->connect_error) {
     crossorigin="anonymous"></script>
   <div class="container mt-4">
     <h2>My Notes</h2>
-    <form>
+
+    <form action="/dxd/dir/new_project_curd.php" method="POST">
       <div class="mb-3">
         <label for="title" class="form-label">Note Title</label>
         <input type="text" class="form-control" id="title" name="title" aria-describedby="emailHelp">
       </div>
 
       <div class="form-floating mb-3">
-        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
-        <label for="floatingTextarea">Note Description</label>
+        <textarea class="form-control" placeholder="Leave a comment here" id="description" name="description"></textarea>
+        <label for="description">Note Description</label>
       </div>
       <button type="submit" class="btn btn-primary">Add Note</button>
     </form>
   </div>
-
-  <div class="container"> 
+<div class="container mt-4"><table class="table">
+  <thead>
+    <tr>
+      <th scope="col">S.NO</th>
+      <th scope="col">Title</th>
+      <th scope="col">Description</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
     <?php
-    $sql = "SELECT * FROM `Note Title`";
+    $sql = "SELECT * FROM `note title`";
     $result = mysqli_query($conn, $sql);
     while ($row = mysqli_fetch_assoc($result)) {
-        echo $row['s_no'] . ". " . $row['title'] . " " . $row['description'] . " " . $row['timestmp'];
-        echo "<br>";
+        echo "<tr>
+        <th scope='row'>" . $row['s_no'] . "</th>
+        <td>" . $row['title'] . "</td>
+        <td>" . $row['description'] . "</td>
+        <td>
+                <button class='btn btn-sm btn-primary'>Actions</button>
+              </td>
+        </tr>";
     }
     ?>
-    </div>
+  </tbody>
+</table>
+</div>
 </body>
 
 </html>
