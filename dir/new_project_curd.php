@@ -1,4 +1,5 @@
 <?php
+$insert = false;
 //INSERT INTO `Note Title` (`s_no`, `title`, `description`, `timestmp`) VALUES (NULL, 'again do it', 'sabji la a ladla', current_timestamp());
 $server = "localhost";
 $username = "root";
@@ -21,10 +22,12 @@ if ($conn->connect_error) {
         $result = mysqli_query($conn, $sql);
 
         if ($result) {
-            echo "The record has been inserted successfully successfully!<br>";
+            // echo "The record has been inserted successfully successfully!<br>";
+            $insert = true;
         } else {
             echo "The record was not inserted successfully because of this error ---> " . mysqli_error($conn);
         }
+      
     }
 
 ?>
@@ -38,9 +41,18 @@ if ($conn->connect_error) {
   <title>PHP curd</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-</head>
+<link rel="stylesheet" href="//cdn.datatables.net/2.3.3/css/dataTables.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script src="//cdn.datatables.net/2.3.3/js/dataTables.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#myTable').DataTable();
+  });
+</script>
+  </head>
 
 <body>
+  
   <nav class="navbar navbar-expand-lg bg-body-tertiary" .navbar data-bs-theme="dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">iNotes</a>
@@ -83,6 +95,15 @@ if ($conn->connect_error) {
       </div>
     </div>
   </nav>
+
+  <?php
+    if ($insert) {
+        echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
+        <strong>Success!</strong> Your note has been inserted successfully
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+      </div>";
+    }
+    ?>
   <h1>Notes</h1>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
@@ -103,7 +124,7 @@ if ($conn->connect_error) {
       <button type="submit" class="btn btn-primary">Add Note</button>
     </form>
   </div>
-<div class="container mt-4"><table class="table">
+<div class="container mt-4"><table class="table" id="myTable">
   <thead>
     <tr>
       <th scope="col">S.NO</th>
@@ -130,6 +151,11 @@ if ($conn->connect_error) {
   </tbody>
 </table>
 </div>
+<footer>
+  <div class="container mt-4">
+    <p class="text-center">&copy; 2025 Your Website. All rights reserved.</p>
+  </div>
+</footer>
 </body>
 
 </html>
