@@ -1,5 +1,7 @@
 <?php
 $insert = false;
+$update = false;
+$delete = false;
 //INSERT INTO `Note Title` (`s_no`, `title`, `description`, `timestmp`) VALUES (NULL, 'again do it', 'sabji la a ladla', current_timestamp());
 $server = "localhost";
 $username = "root";
@@ -13,7 +15,29 @@ $conn = new mysqli($server, $username, $password, $database);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+// echo "Connected successfully";
+if (isset($_GET['delete'])) {
+  $s_no = $_GET['delete'];
+  $sql = "DELETE FROM `note title` WHERE `s_no` = $s_no";
+  $result = mysqli_query($conn, $sql);
+  if ($result) {
+      $delete = true;
+  }
+}
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+      if (isset($_POST['snoEdit'])) {
+        // Update the record
+        $title = $_POST['title'];
+        $s_no = $_POST['snoEdit'];
+        $description = $_POST['description'];
+
+        // Sql query to be executed update
+        $sql = "UPDATE `note title` SET `description` = '$description' , `title` = '$title' WHERE `note title`.`s_no` = $s_no";
+        $result = mysqli_query($conn, $sql);
+        if ($result) {$update = true;
+      }
+      }
+      else {
         $title = $_POST['title'];
         $description = $_POST['description'];
 
@@ -27,9 +51,10 @@ if ($conn->connect_error) {
         } else {
             echo "The record was not inserted successfully because of this error ---> " . mysqli_error($conn);
         }
-      
+      }
     }
 
+// Close the database connection
 ?>
 
 <!doctype html>
@@ -49,9 +74,44 @@ if ($conn->connect_error) {
     $('#myTable').DataTable();
   });
 </script>
+
   </head>
 
 <body>
+  <!-- Edit Modal trigger modal -->
+<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">
+  Edit Modal
+</button> -->
+
+<!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fs-5" id="editModalLabel">Edit Note</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/dxd/dir/new_project_curd.php" method="POST">
+  <input type="hidden" id="snoEdit" name="snoEdit">
+  <div class="mb-3">
+    <label for="editTitle" class="form-label">Note Title</label>
+    <input type="text" class="form-control" id="editTitle" name="title" required>
+  </div>
+  <div class="mb-3">
+    <label for="editDescription" class="form-label">Description</label>
+    <textarea class="form-control" id="editDescription" name="description" rows="3" required></textarea>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save changes</button>
+  </div>
+</form>
+
+      </div>
+    </div>
+  </div>
+</div>
   
   <nav class="navbar navbar-expand-lg bg-body-tertiary" .navbar data-bs-theme="dark">
     <div class="container-fluid">
@@ -95,11 +155,25 @@ if ($conn->connect_error) {
       </div>
     </div>
   </nav>
-
+<div class="container mt-4">
   <?php
     if ($insert) {
         echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
         <strong>Success!</strong> Your note has been inserted successfully
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+      </div>";
+    }
+    
+    if ($delete) {
+        echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
+        <strong>Success!</strong> Your note has been deleted successfully
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+      </div>";
+    }
+    
+    if ($update) {
+        echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
+        <strong>Success!</strong> Your note has been updated successfully
         <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
       </div>";
     }
@@ -137,13 +211,17 @@ if ($conn->connect_error) {
     <?php
     $sql = "SELECT * FROM `note title`";
     $result = mysqli_query($conn, $sql);
+    $s_no = 0;
     while ($row = mysqli_fetch_assoc($result)) {
+      $s_no++;
         echo "<tr>
-        <th scope='row'>" . $row['s_no'] . "</th>
+        <th scope='row'>" . $s_no . "</th>
         <td>" . $row['title'] . "</td>
         <td>" . $row['description'] . "</td>
         <td>
-                <button class='btn btn-sm btn-primary'>Actions</button>
+                <button class='edit btn btn-sm btn-primary' id='" . $row['s_no'] . "'>Edit</button>
+                <button class='delete btn btn-sm btn-danger' id='d" . $row['s_no'] . "'>Delete</button>
+                <button class='btn btn-sm btn-info'>View</button>
               </td>
         </tr>";
     }
@@ -156,6 +234,35 @@ if ($conn->connect_error) {
     <p class="text-center">&copy; 2025 Your Website. All rights reserved.</p>
   </div>
 </footer>
+<script>
+edits = document.getElementsByClassName('edit');
+Array.from(edits).forEach((element) => {
+  element.addEventListener('click', (e) => {
+    console.log(e);
+    var row = e.target.parentNode.parentNode;
+    title = row.querySelector('td:nth-child(2)').innerText;
+    description = row.querySelector('td:nth-child(3)').innerText;
+    editTitle.value = title;
+    editDescription.value = description;
+    snoEdit.value = e.target.id;
+$(editModal).modal('toggle');
+  })
+})
+deletes = document.getElementsByClassName('delete');
+Array.from(deletes).forEach((element) => {
+  element.addEventListener('click', (e) => {
+    console.log(e);
+    s_no = e.target.id.substr(1);
+    window.location = `/dxd/dir/new_project_curd.php?delete=${s_no}`;
+
+    if (confirm("Are you sure you want to delete this note?")) {
+      console.log("Note deleted:", s_no);
+    } else {
+      console.log("Note deletion canceled:", s_no);
+    }
+  })
+})
+</script>
 </body>
 
 </html>
