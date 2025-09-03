@@ -6,9 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Successfully signed up</title>
     <?php require 'partials/_navbar.php'; ?>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 </head>
 
 <body>
+
+    </div>
     <div class="container">
         <h2 class="text-center">Signup to our Website</h2>
         <form action="dxd/loginsystem/" method="post">
