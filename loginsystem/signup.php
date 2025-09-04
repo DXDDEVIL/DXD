@@ -1,3 +1,42 @@
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    include($_SERVER['DOCUMENT_ROOT'] . '/DXD/loginsystem/partials/_dbconnect.php');
+
+    $username = $_POST['username'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $cpassword = $_POST['cpassword'];
+    // Check whether this username exists
+    $existSql = "SELECT * FROM `users` WHERE userName = '$username'";
+    $result = mysqli_query($conn, $existSql);
+    $numExistRows = mysqli_num_rows($result);
+    if ($numExistRows > 0) {
+        // $showError = "Username Already Exists";
+        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> Username Already Exists.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>';
+    } else {
+        if (($password == $cpassword)) {
+            $hash = password_hash($password, PASSWORD_DEFAULT);
+            $sql = "INSERT INTO `users` ( `userName`, `email`, `pass`, `s_no`) VALUES ( '$username', '$email', '$hash', NULL)";
+            $result = mysqli_query($conn, $sql);
+            if ($result) {
+                // $showAlert = true;
+                header("Location: /DXD/loginsystem/welcome.php?signupsuccess=true");
+                exit();
+            }
+        } else {
+            // $showError = "Passwords do not match";
+            echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> Passwords do not match.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>';
+        }
+    }
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,18 +45,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Successfully signed up</title>
     <?php require 'partials/_navbar.php'; ?>
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <strong>Holy guacamole!</strong> You should check in on some of those fields below.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
 </head>
 
 <body>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Signup Successfully</strong> Lets Proceed Ahead.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
     </div>
     <div class="container">
         <h2 class="text-center">Signup to our Website</h2>
-        <form action="dxd/loginsystem/" method="post">
+        <form action="signup.php" method="post">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" class="form-control" id="username" name="username" required>
