@@ -1,9 +1,10 @@
 <?php
-session_start();
 
 $loggedin = false;
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true) {
     $loggedin = true;
+} else {
+    $loggedin = false;
 }
 
 echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
@@ -27,7 +28,8 @@ if (!$loggedin) {
     <li class="nav-item">
         <a class="nav-link" href="/dxd/loginsystem/signup.php">SignUp</a>
     </li>';
-} else {
+}
+if ($loggedin) {
     echo '
     <li class="nav-item">
         <a class="nav-link" href="/dxd/loginsystem/logout.php">Logout</a>
