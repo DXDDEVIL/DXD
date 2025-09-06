@@ -1,4 +1,5 @@
 <?php
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     include($_SERVER['DOCUMENT_ROOT'] . '/DXD/loginsystem/partials/_dbconnect.php');
 
@@ -16,22 +17,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <strong>Error!</strong> Username Already Exists.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>';
-    } else {
-        if (($password == $cpassword)) {
-            $hash = password_hash($password, PASSWORD_DEFAULT);
-            $sql = "INSERT INTO `users` ( `userName`, `email`, `pass`, `s_no`) VALUES ( '$username', '$email', '$hash', NULL)";
-            $result = mysqli_query($conn, $sql);
-            if ($result) {
-                // $showAlert = true;
-                header("Location: /DXD/loginsystem/welcome.php?signupsuccess=true");
-                exit();
-            }
-        } else {
-            // $showError = "Passwords do not match";
+    } elseif ($numExistRows == 0) {
+        $existSql = "SELECT * FROM `users` WHERE email = '$email'";
+        $result = mysqli_query($conn, $existSql);
+        $numExistRows = mysqli_num_rows($result);
+        if ($numExistRows > 0) {
+            // $showError = "Email Already Exists";
             echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> Email Already Exists.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>';
+        } else {
+            if (($password == $cpassword)) {
+                $hash = password_hash($password, PASSWORD_DEFAULT);
+                $sql = "INSERT INTO `users` ( `userName`, `email`, `pass`, `s_no`) VALUES ( '$username', '$email', '$hash', NULL)";
+                $result = mysqli_query($conn, $sql);
+                if ($result) {
+                    // $showAlert = true;
+                    header("Location: /DXD/loginsystem/signup.php?signupsuccess=true");
+                    exit();
+                }
+            } else {
+                // $showError = "Passwords do not match";
+                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
         <strong>Error!</strong> Passwords do not match.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>';
+            }
         }
     }
 }
@@ -48,10 +60,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>Signup Successfully</strong> Lets Proceed Ahead.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+    <?php
+    if (isset($_GET['signupsuccess']) && $_GET['signupsuccess'] == "true") {
+        echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Signup Successfully</strong> Lets Proceed Ahead.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>';
+    }
+    ?>
 
     </div>
     <div class="container">
